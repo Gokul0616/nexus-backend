@@ -19,6 +19,7 @@ import com.nexus.nexus.MyPackage.Configuration.JwtRequestUtil;
 import com.nexus.nexus.MyPackage.Configuration.UserInfoService;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationDto;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationResponse;
+import com.nexus.nexus.MyPackage.Dto.ForgotPasswordRequest;
 import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UserProfileDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
@@ -109,6 +110,26 @@ public class UserController {
             return ResponseEntity.ok("Profile updated successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/auth/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+
+        String email = request.getEmail();
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Email must not be empty.");
+        }
+
+        String normalizedEmail = email.toLowerCase().trim();
+
+        if (myUserServices.existsByEmail(normalizedEmail)) {
+            System.out.println("Email found: " + normalizedEmail);
+            myUserServices.sendResetInstructions(normalizedEmail);
+            return ResponseEntity.ok("Password reset instructions sent to " + normalizedEmail);
+        } else {
+            System.out.println("Email not found: " + normalizedEmail);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
         }
     }
 

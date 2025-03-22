@@ -45,7 +45,7 @@ public class UserModal implements UserDetails {
     private String profilePic;
     private String followerCount;
     private String followingCount;
-
+    private String resetToken;
     private List<GrantedAuthority> authorities;
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
