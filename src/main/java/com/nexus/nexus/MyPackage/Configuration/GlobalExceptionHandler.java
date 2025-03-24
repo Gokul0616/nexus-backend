@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,6 +20,15 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AlreadyFollowingException.class)
+    public ResponseEntity<?> handleAlreadyFollowingException(AlreadyFollowingException ex, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", new Date());
+        body.put("message", ex.getMessage());
+        // Return HTTP 409 Conflict status to indicate duplicate follow
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAllExceptions(Exception ex, WebRequest request) {
@@ -82,5 +90,4 @@ public class GlobalExceptionHandler {
         body.put("message", "Endpoint not found");
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
-
 }

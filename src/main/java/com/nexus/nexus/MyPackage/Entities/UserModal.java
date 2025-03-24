@@ -2,6 +2,7 @@ package com.nexus.nexus.MyPackage.Entities;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,17 +44,32 @@ public class UserModal implements UserDetails {
     private String location;
     private double streakPercentage;
     private String profilePic;
-    private String followerCount;
-    private String followingCount;
+
     private String resetToken;
     private List<GrantedAuthority> authorities;
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VideosEntity> videos;
 
+    @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> followers;
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> following;
+
     @Transient
     public int getPostCount() {
         return videos == null ? 0 : videos.size();
+    }
+
+    @Transient
+    public int getFollowerCount() {
+        return followers == null ? 0 : followers.size();
+    }
+
+    @Transient
+    public int getFollowingCount() {
+        return following == null ? 0 : following.size();
     }
 
     @Override

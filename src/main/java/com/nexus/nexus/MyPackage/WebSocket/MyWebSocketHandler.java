@@ -64,18 +64,21 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    // Method to send a message to a specific user.
-    public static void sendMessageToUser(String userId, String message) {
+    public static String sendMessageToUser(String userId, String message) {
         WebSocketSession session = userSessions.get(userId);
         if (session != null && session.isOpen()) {
             try {
                 session.sendMessage(new TextMessage(message));
                 System.out.println("Message sent to user " + userId);
+                return "Message sent to user " + userId;
             } catch (IOException e) {
                 System.err.println("Error sending message to user " + userId + ": " + e.getMessage());
+                return "Error sending message to user " + userId + ": " + e.getMessage();
             }
         } else {
             System.err.println("Session for user " + userId + " not found or closed.");
+            // So her us epush notification
+            return "Session for user " + userId + " not found or closed.";
         }
     }
 }

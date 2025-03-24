@@ -1,6 +1,7 @@
 package com.nexus.nexus.MyPackage.Controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +22,13 @@ import com.nexus.nexus.MyPackage.Configuration.UserInfoService;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationDto;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationResponse;
 import com.nexus.nexus.MyPackage.Dto.ForgotPasswordRequest;
+import com.nexus.nexus.MyPackage.Dto.OtherUserProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UserProfileDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
+import com.nexus.nexus.MyPackage.Repository.FollowRepository;
+import com.nexus.nexus.MyPackage.Repository.UserRepository;
 import com.nexus.nexus.MyPackage.Repository.VideosRepository;
 import com.nexus.nexus.MyPackage.Services.MyUserServices;
 
@@ -38,6 +43,8 @@ public class UserController {
     private final JwtRequestUtil jwtRequestUtil;
     private final UserInfoService userInfoService;
     private final VideosRepository videosRepository;
+    private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     @GetMapping("/test")
     private String test() {
@@ -70,12 +77,13 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDto> getUserProfile(Authentication authentication) {
+        UserModal authUser = (UserModal) authentication.getPrincipal();
+        UserModal user = userRepository.findByIdWithFollows(authUser.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        UserModal user = (UserModal) authentication.getPrincipal();
-        System.out.println(user.getUserId());
         List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
-
         UserProfileDto userProfile = new UserProfileDto(
+                user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getFullName(),
@@ -84,9 +92,45 @@ public class UserController {
                 user.getStreakPercentage(),
                 user.getProfilePic(),
                 String.valueOf(videos.size()),
-                user.getFollowerCount(),
-                user.getFollowingCount(),
+                String.valueOf(user.getFollowerCount()),
+                String.valueOf(user.getFollowingCount()),
                 videos);
+        return ResponseEntity.ok(userProfile);
+    }
+
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<OtherUserProfileDto> getUserProfileByUsername(@PathVariable String username,
+            Authentication authentication) {
+        Optional<UserModal> userOptional = userRepository.findByUsername(username);
+        if (!userOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        UserModal user = userOptional.get();
+
+        List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
+
+        // Determine if the current authenticated user is following this user
+        boolean isFollowing = false;
+        if (authentication != null && authentication.getPrincipal() instanceof UserModal) {
+            UserModal currentUser = (UserModal) authentication.getPrincipal();
+            isFollowing = followRepository.existsByFollower_UserIdAndFollowee_UserId(
+                    currentUser.getUserId(), user.getUserId());
+        }
+
+        OtherUserProfileDto userProfile = new OtherUserProfileDto(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getBio(),
+                user.getLocation(),
+                user.getStreakPercentage(),
+                user.getProfilePic(),
+                String.valueOf(videos.size()),
+                String.valueOf(user.getFollowerCount()),
+                String.valueOf(user.getFollowingCount()),
+                videos,
+                isFollowing);
         return ResponseEntity.ok(userProfile);
     }
 

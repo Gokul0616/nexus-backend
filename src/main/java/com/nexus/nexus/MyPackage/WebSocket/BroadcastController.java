@@ -22,8 +22,8 @@ public class BroadcastController {
 
     @PostMapping("/broadcast/user")
     public String broadcastToUser(@RequestBody ParticularUser particularUser) {
-        MyWebSocketHandler.sendMessageToUser(particularUser.getUserId(), particularUser.getMessage());
-        return "Message sent to user: " + particularUser.getUserId();
+        String message = MyWebSocketHandler.sendMessageToUser(particularUser.getUserId(), particularUser.getMessage());
+        return message;
     }
 
 }
