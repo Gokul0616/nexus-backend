@@ -9,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class VideoResponseDto {
     private String id;
+    private String videoId;
     private String videoSource;
     private String username;
     private String title;
@@ -20,4 +21,5 @@ public class VideoResponseDto {
     private String musicTitle;
     private String thumbnail;
     private String profilePic;
+    private boolean likedByCurrentUser;
 }

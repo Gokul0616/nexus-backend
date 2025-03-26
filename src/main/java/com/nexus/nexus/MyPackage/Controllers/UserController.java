@@ -106,10 +106,8 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         UserModal user = userOptional.get();
-
         List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
 
-        // Determine if the current authenticated user is following this user
         boolean isFollowing = false;
         if (authentication != null && authentication.getPrincipal() instanceof UserModal) {
             UserModal currentUser = (UserModal) authentication.getPrincipal();

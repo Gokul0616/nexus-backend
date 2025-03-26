@@ -32,7 +32,7 @@ public class NexusApplication {
 			user1.setUserId("user001");
 			user1.setUsername("Gokul");
 			user1.setFullName("Gokul R");
-			user1.setEmail("gokulgokul10203@gmail.com");
+			user1.setEmail("gokul@gmail.com");
 			user1.setPassword("Gokul001@");
 			user1.setProfilePic("https://cdn3.pixelcut.app/7/20/uncrop_hero_bdf08a8ca6.jpg");
 
@@ -260,7 +260,8 @@ public class NexusApplication {
 			video19.setThumbnail(
 					"https://images.pexels.com/photos/814830/pexels-photo-814830.jpeg?cs=srgb&dl=pexels-evgeniy-grozev-814830.jpg&fm=jpg");
 			video19.setDescription("Alice's third video");
-			video19.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4");
+			video19.setVideoUrl(
+					"https://firebasestorage.googleapis.com/v0/b/tieoda.appspot.com/o/post%2F9QwvEOpJXXM5bn8BjUIP1D6UL6A2%2F344741e3-5fe7-4a98-a1ce-7bb0ac96ab9f%2Fvideo?alt=media&token=e8ac526c-edd0-4118-a813-56781d5fc7f8");
 			video19.setUserId(user2.getUserId());
 			userRepo.saveAll(Arrays.asList(user1, user2, user3, user4, user5, user6, user7, user8, user9));
 

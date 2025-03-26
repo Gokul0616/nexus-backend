@@ -1,9 +1,11 @@
 package com.nexus.nexus.MyPackage.Entities;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -48,7 +50,7 @@ public class UserModal implements UserDetails {
     private String resetToken;
     private List<GrantedAuthority> authorities;
 
-    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VideosEntity> videos;
 
     @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -56,6 +58,13 @@ public class UserModal implements UserDetails {
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> following;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VideoLike> videoLikes;
 
     @Transient
     public int getPostCount() {

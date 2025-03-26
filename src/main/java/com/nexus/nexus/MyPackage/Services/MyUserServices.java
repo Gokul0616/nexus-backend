@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +12,7 @@ import com.nexus.nexus.MyPackage.Dto.AuthenticationDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
 import com.nexus.nexus.MyPackage.utils.Email.EmailService;
-
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -36,8 +34,12 @@ public class MyUserServices {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email is already registered");
         }
-        UserModal usermodal = userRepository.save(user);
-        return jwtUtil.generateToken(usermodal.getUsername());
+
+        user.setUserId(UUID.randomUUID().toString());
+        user.setCreatedAt(LocalDateTime.now());
+
+        UserModal savedUser = userRepository.save(user);
+        return jwtUtil.generateToken(savedUser.getUsername());
     }
 
     public String authenticate(AuthenticationDto authDto) {

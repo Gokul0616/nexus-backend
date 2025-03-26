@@ -8,4 +8,6 @@ import com.nexus.nexus.MyPackage.Entities.VideosEntity;
 
 public interface VideosRepository extends JpaRepository<VideosEntity, Long> {
     List<VideosEntity> findByUserId(String userId);
+
+    VideosEntity findByVideoId(String videoId);
 }
