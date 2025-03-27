@@ -1,9 +1,12 @@
 package com.nexus.nexus;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +25,13 @@ public class NexusApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(NexusApplication.class, args);
+	}
+
+	private LocalDateTime getRandomDateTimeBetween(LocalDateTime start, LocalDateTime end) {
+		long startEpoch = start.toEpochSecond(ZoneOffset.UTC);
+		long endEpoch = end.toEpochSecond(ZoneOffset.UTC);
+		long randomEpoch = ThreadLocalRandom.current().nextLong(startEpoch, endEpoch);
+		return LocalDateTime.ofEpochSecond(randomEpoch, 0, ZoneOffset.UTC);
 	}
 
 	@Bean
@@ -51,6 +61,8 @@ public class NexusApplication {
 			user3.setUsername("Bob");
 			user3.setFullName("Bob Builder");
 			user3.setEmail("bob@example.com");
+			user3.setBio("Welcome to my profile");
+			user3.setLocation("Sanfransisco , California");
 			user3.setPassword("Bob@1234");
 			user3.setProfilePic("https://randomuser.me/api/portraits/men/2.jpg");
 
@@ -263,6 +275,7 @@ public class NexusApplication {
 			video19.setVideoUrl(
 					"https://firebasestorage.googleapis.com/v0/b/tieoda.appspot.com/o/post%2F9QwvEOpJXXM5bn8BjUIP1D6UL6A2%2F344741e3-5fe7-4a98-a1ce-7bb0ac96ab9f%2Fvideo?alt=media&token=e8ac526c-edd0-4118-a813-56781d5fc7f8");
 			video19.setUserId(user2.getUserId());
+
 			userRepo.saveAll(Arrays.asList(user1, user2, user3, user4, user5, user6, user7, user8, user9));
 
 			List<VideosEntity> user1Videos = new ArrayList<>();
@@ -275,6 +288,15 @@ public class NexusApplication {
 					video3, video4, video5, video6, video7, video8,
 					video9, video10, video11, video12, video13, video14,
 					video15, video16, video17, video18, video19));
+			LocalDateTime now = LocalDateTime.now();
+			LocalDateTime thirtyDaysAgo = now.minusDays(30);
+
+			for (VideosEntity video : allVideos) {
+				LocalDateTime randomCreatedAt = getRandomDateTimeBetween(thirtyDaysAgo, now);
+				video.setCreatedAt(randomCreatedAt);
+				LocalDateTime randomUpdatedAt = getRandomDateTimeBetween(randomCreatedAt, now);
+				video.setUpdatedAt(randomUpdatedAt);
+			}
 
 			videosRepo.saveAll(allVideos);
 
@@ -301,6 +323,7 @@ public class NexusApplication {
 					others.add(user);
 				}
 			}
+
 			Random random = new Random();
 			for (UserModal user : others) {
 

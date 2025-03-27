@@ -22,4 +22,5 @@ public class UserProfileDto {
     private String followerCount;
     private String followingCount;
     private List<VideosEntity> videos;
+    private List<VideosEntity> likedVideos;
 }

@@ -5,9 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
 @Setter
+@AllArgsConstructor
 public class AuthenticationDto {
-    private String email;
+    private String login;
     private String password;
 }

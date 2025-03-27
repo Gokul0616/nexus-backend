@@ -2,7 +2,6 @@ package com.nexus.nexus.MyPackage.Services;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,6 @@ public class PostServices {
 
     public List<VideosEntity> getRecommendation() {
         return videosRepository.findAll();
-
     }
 
     public boolean isVideoLikedByUser(UserModal user, VideosEntity video) {
@@ -38,4 +36,10 @@ public class PostServices {
         videoLikeRepository.save(videoLike);
     }
 
+    public void removeLikeVideo(UserModal user, VideosEntity video) {
+        VideoLike videoLike = videoLikeRepository.findByUserAndVideo(user, video);
+        if (videoLike != null) {
+            videoLikeRepository.delete(videoLike);
+        }
+    }
 }

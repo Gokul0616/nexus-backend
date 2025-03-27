@@ -1,18 +1,30 @@
 package com.nexus.nexus.MyPackage.Services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.nexus.nexus.MyPackage.Configuration.JwtRequestUtil;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationDto;
+import com.nexus.nexus.MyPackage.Dto.OtherUserProfileDto;
+import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
+import com.nexus.nexus.MyPackage.Dto.UserProfileDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
+import com.nexus.nexus.MyPackage.Entities.VideoLike;
+import com.nexus.nexus.MyPackage.Entities.VideosEntity;
+import com.nexus.nexus.MyPackage.Repository.FollowRepository;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
+import com.nexus.nexus.MyPackage.Repository.VideoLikeRepository;
+import com.nexus.nexus.MyPackage.Repository.VideosRepository;
 import com.nexus.nexus.MyPackage.utils.Email.EmailService;
-import java.time.LocalDateTime;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,7 +32,9 @@ import lombok.RequiredArgsConstructor;
 public class MyUserServices {
     private final UserRepository userRepository;
     private final JwtRequestUtil jwtUtil;
-
+    private final VideoLikeRepository videoLikeRepository;
+    private final VideosRepository videosRepository;
+    private final FollowRepository followRepository;
     private final EmailService emailService;
 
     public List<UserModal> getAllUser() {
@@ -44,21 +58,108 @@ public class MyUserServices {
 
     public String authenticate(AuthenticationDto authDto) {
 
-        Optional<UserModal> userModalOpt = userRepository.findByEmail(authDto.getEmail());
+        String login = authDto.getLogin();
+        Optional<UserModal> userModalOpt;
+        if (login.contains("@")) {
+            userModalOpt = userRepository.findByEmail(login);
+        } else {
+            userModalOpt = userRepository.findByUsername(login);
+        }
+
         if (!userModalOpt.isPresent()) {
-            throw new BadCredentialsException("User not found with username: " + authDto.getEmail());
+            throw new BadCredentialsException("User not found with login: " + login);
         }
 
         UserModal userModal = userModalOpt.get();
-        System.out.println(authDto.getPassword().equals(userModal.getPassword()));
-
         if (!authDto.getPassword().equals(userModal.getPassword())) {
             throw new BadCredentialsException("Incorrect password");
         }
 
         String token = jwtUtil.generateToken(userModal.getUsername());
-
         return token;
+    }
+
+    public UserProfileDto getUserProfile(Authentication authentication) {
+        UserModal authUser = (UserModal) authentication.getPrincipal();
+        UserModal user = userRepository.findByIdWithFollows(authUser.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
+
+        List<VideoLike> videoLikes = videoLikeRepository.findByUser(user);
+        List<VideosEntity> likedVideos = videoLikes.stream()
+                .map(VideoLike::getVideo)
+                .collect(Collectors.toList());
+
+        UserProfileDto userProfile = new UserProfileDto(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getBio(),
+                user.getLocation(),
+                user.getStreakPercentage(),
+                user.getProfilePic(),
+                String.valueOf(videos.size()),
+                String.valueOf(user.getFollowerCount()),
+                String.valueOf(user.getFollowingCount()),
+                videos,
+                likedVideos // send liked videos
+        );
+        return userProfile;
+    }
+
+    public ResponseEntity<OtherUserProfileDto> getOtherUserProfile(Authentication authentication, String username) {
+        Optional<UserModal> userOptional = userRepository.findByUsername(username);
+        if (!userOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        UserModal user = userOptional.get();
+        List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
+
+        boolean isFollowing = false;
+        if (authentication != null && authentication.getPrincipal() instanceof UserModal) {
+            UserModal currentUser = (UserModal) authentication.getPrincipal();
+            isFollowing = followRepository.existsByFollower_UserIdAndFollowee_UserId(
+                    currentUser.getUserId(), user.getUserId());
+        }
+
+        OtherUserProfileDto userProfile = new OtherUserProfileDto(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getBio(),
+                user.getLocation(),
+                user.getStreakPercentage(),
+                user.getProfilePic(),
+                String.valueOf(videos.size()),
+                String.valueOf(user.getFollowerCount()),
+                String.valueOf(user.getFollowingCount()),
+                videos,
+                isFollowing);
+        return ResponseEntity.ok(userProfile);
+    }
+
+    public ResponseEntity<?> updateProfile(Authentication authentication, UploadProfileDto updateDto) {
+        try {
+            UserModal currentUser = (UserModal) authentication.getPrincipal();
+
+            currentUser.setFullName(updateDto.getFullName());
+            currentUser.setBio(updateDto.getBio());
+            currentUser.setLocation(updateDto.getLocation());
+
+            String newProfilePic = updateDto.getProfilePic();
+            if (newProfilePic == null || newProfilePic.trim().isEmpty()) {
+                newProfilePic = currentUser.getProfilePic();
+            }
+            currentUser.setProfilePic(newProfilePic);
+
+            updateProfile(currentUser);
+            return ResponseEntity.ok("Profile updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     public UserModal updateProfile(UserModal user) {

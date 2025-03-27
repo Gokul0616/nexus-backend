@@ -1,6 +1,10 @@
 package com.nexus.nexus.MyPackage.Entities;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -32,8 +36,13 @@ public class VideosEntity {
     private String category;
     private String tags;
     private String status;
-    private String createdAt;
-    private String updatedAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(name = "user_id", nullable = false)
     private String userId;

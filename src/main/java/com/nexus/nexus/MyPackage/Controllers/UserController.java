@@ -2,6 +2,7 @@ package com.nexus.nexus.MyPackage.Controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import com.nexus.nexus.MyPackage.Dto.OtherUserProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UserProfileDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
+import com.nexus.nexus.MyPackage.Entities.VideoLike;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
 import com.nexus.nexus.MyPackage.Repository.FollowRepository;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
@@ -58,6 +60,7 @@ public class UserController {
 
     @PostMapping("/auth/signin")
     public ResponseEntity<AuthenticationResponse> signin(@RequestBody AuthenticationDto authDto) {
+        System.out.println("authDto: " + authDto.getLogin() + " " + authDto.getPassword());
         String token = myUserServices.authenticate(authDto);
         return ResponseEntity.ok(new AuthenticationResponse(token, "Login Successful"));
     }
@@ -77,82 +80,21 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<UserProfileDto> getUserProfile(Authentication authentication) {
-        UserModal authUser = (UserModal) authentication.getPrincipal();
-        UserModal user = userRepository.findByIdWithFollows(authUser.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
-        UserProfileDto userProfile = new UserProfileDto(
-                user.getUserId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFullName(),
-                user.getBio(),
-                user.getLocation(),
-                user.getStreakPercentage(),
-                user.getProfilePic(),
-                String.valueOf(videos.size()),
-                String.valueOf(user.getFollowerCount()),
-                String.valueOf(user.getFollowingCount()),
-                videos);
+        UserProfileDto userProfile = myUserServices.getUserProfile(authentication);
         return ResponseEntity.ok(userProfile);
     }
 
     @GetMapping("/profile/{username}")
     public ResponseEntity<OtherUserProfileDto> getUserProfileByUsername(@PathVariable String username,
             Authentication authentication) {
-        Optional<UserModal> userOptional = userRepository.findByUsername(username);
-        if (!userOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        UserModal user = userOptional.get();
-        List<VideosEntity> videos = videosRepository.findByUserId(user.getUserId());
 
-        boolean isFollowing = false;
-        if (authentication != null && authentication.getPrincipal() instanceof UserModal) {
-            UserModal currentUser = (UserModal) authentication.getPrincipal();
-            isFollowing = followRepository.existsByFollower_UserIdAndFollowee_UserId(
-                    currentUser.getUserId(), user.getUserId());
-        }
-
-        OtherUserProfileDto userProfile = new OtherUserProfileDto(
-                user.getUserId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFullName(),
-                user.getBio(),
-                user.getLocation(),
-                user.getStreakPercentage(),
-                user.getProfilePic(),
-                String.valueOf(videos.size()),
-                String.valueOf(user.getFollowerCount()),
-                String.valueOf(user.getFollowingCount()),
-                videos,
-                isFollowing);
-        return ResponseEntity.ok(userProfile);
+        return myUserServices.getOtherUserProfile(authentication, username);
     }
 
     @PostMapping("/updateProfile")
     public ResponseEntity<?> updateProfile(@RequestBody UploadProfileDto updateDto,
             Authentication authentication) {
-        try {
-            UserModal currentUser = (UserModal) authentication.getPrincipal();
-
-            currentUser.setFullName(updateDto.getFullName());
-            currentUser.setBio(updateDto.getBio());
-            currentUser.setLocation(updateDto.getLocation());
-
-            String newProfilePic = updateDto.getProfilePic();
-            if (newProfilePic == null || newProfilePic.trim().isEmpty()) {
-                newProfilePic = currentUser.getProfilePic();
-            }
-            currentUser.setProfilePic(newProfilePic);
-
-            myUserServices.updateProfile(currentUser);
-            return ResponseEntity.ok("Profile updated successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return myUserServices.updateProfile(authentication, updateDto);
     }
 
     @PostMapping("/auth/forgot-password")

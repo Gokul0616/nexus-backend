@@ -72,7 +72,6 @@ public class PostController {
     public ResponseEntity<String> addLike(@RequestBody LikeRequest request, Authentication authentication) {
         UserModal user = (UserModal) authentication.getPrincipal();
         String videoId = request.getVideoId();
-        System.out.println("Received videoId: " + videoId);
 
         VideosEntity video = videosRepository.findByVideoId(videoId);
         if (video == null) {
@@ -88,4 +87,21 @@ public class PostController {
         return ResponseEntity.ok("Like added successfully");
     }
 
+    @PostMapping("/removeLike")
+    public ResponseEntity<String> removeLike(@RequestBody LikeRequest request, Authentication authentication) {
+        UserModal user = (UserModal) authentication.getPrincipal();
+        String videoId = request.getVideoId();
+
+        VideosEntity video = videosRepository.findByVideoId(videoId);
+        if (video == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Video not found");
+        }
+
+        if (!postServices.isVideoLikedByUser(user, video)) {
+            return ResponseEntity.ok("Video not liked by user");
+        }
+
+        postServices.removeLikeVideo(user, video);
+        return ResponseEntity.ok("Like removed successfully");
+    }
 }

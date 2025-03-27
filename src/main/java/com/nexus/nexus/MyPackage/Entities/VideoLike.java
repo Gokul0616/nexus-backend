@@ -31,7 +31,7 @@ public class VideoLike {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     @JsonIgnore
-    private UserModal user; // Fix: Reference UserModal.id (long)
+    private UserModal user;
 
     @ManyToOne
     @JoinColumn(name = "video_id", referencedColumnName = "videoId", nullable = false)
