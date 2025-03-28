@@ -29,7 +29,6 @@ public class VideosEntity {
     @Column(unique = true)
     private String videoId;
 
-    private String title;
     private String description;
     private String thumbnail;
     private String videoUrl;

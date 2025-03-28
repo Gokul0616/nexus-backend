@@ -16,6 +16,7 @@ import com.nexus.nexus.MyPackage.Dto.AuthenticationDto;
 import com.nexus.nexus.MyPackage.Dto.OtherUserProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UserProfileDto;
+import com.nexus.nexus.MyPackage.Dto.UserSearchResultDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideoLike;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
@@ -178,6 +179,28 @@ public class MyUserServices {
     public boolean existsByEmail(String email) {
         Optional<UserModal> userOpt = userRepository.findByEmail(email);
         return userOpt.isPresent();
+    }
+
+    public List<UserSearchResultDto> searchUsers(String query) {
+        List<UserModal> users = userRepository.findByUsernameContainingIgnoreCase(query);
+        return users.stream()
+                .map(user -> new UserSearchResultDto(
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getProfilePic()))
+                .collect(Collectors.toList());
+    }
+
+    // Get username for a given userId
+    public String getUsernameByUserId(String userId) {
+        Optional<UserModal> user = userRepository.findByUserId(userId);
+        return user != null ? user.get().getUsername() : "";
+    }
+
+    // Get profile picture URL for a given userId
+    public String getProfilePicByUserId(String userId) {
+        Optional<UserModal> user = userRepository.findByUserId(userId);
+        return user != null ? user.get().getProfilePic() : "";
     }
 
     public void sendResetInstructions(String email) {

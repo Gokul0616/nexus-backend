@@ -27,6 +27,10 @@ public class PostServices {
         return videoLikeRepository.existsByUserAndVideo(user, video);
     }
 
+    public List<VideosEntity> searchVideos(String query) {
+        return videosRepository.findByDescriptionContainingIgnoreCaseOrTagsContainingIgnoreCase(query, query);
+    }
+
     public void likeVideo(UserModal user, VideosEntity video, String id) {
         VideoLike videoLike = new VideoLike();
         videoLike.setUser(user);

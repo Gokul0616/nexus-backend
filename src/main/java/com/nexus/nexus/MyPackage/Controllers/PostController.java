@@ -53,7 +53,6 @@ public class PostController {
                     video.getVideoId(),
                     video.getVideoUrl(),
                     username,
-                    video.getTitle(),
                     video.getDescription(),
                     video.getLikes() != null ? video.getLikes().size() : 0,
                     0,

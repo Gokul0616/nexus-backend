@@ -116,7 +116,7 @@ public class NexusApplication {
 
 			VideosEntity video1 = new VideosEntity();
 			video1.setVideoId("video001");
-			video1.setTitle("Sample Video 1");
+
 			video1.setThumbnail("https://images.unsplash.com/photo-1575936123452-b67c3203c357?fm=jpg&q=60&w=3000");
 			video1.setDescription("Description for video 1");
 			video1.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4");
@@ -124,7 +124,7 @@ public class NexusApplication {
 
 			VideosEntity video2 = new VideosEntity();
 			video2.setVideoId("video002");
-			video2.setTitle("Sample Video 2");
+
 			video2.setThumbnail("https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?fm=jpg&q=60");
 			video2.setDescription("Description for video 2");
 			video2.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4");
@@ -132,7 +132,7 @@ public class NexusApplication {
 
 			VideosEntity video3 = new VideosEntity();
 			video3.setVideoId("video003");
-			video3.setTitle("Alice Video 1");
+
 			video3.setThumbnail("https://images.unsplash.com/photo-1494790108377-be9c29b29330?fm=jpg&q=60");
 			video3.setDescription("Alice's first video");
 			video3.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4");
@@ -140,7 +140,7 @@ public class NexusApplication {
 
 			VideosEntity video4 = new VideosEntity();
 			video4.setVideoId("video004");
-			video4.setTitle("Alice Video 2");
+
 			video4.setThumbnail(
 					"https://images.pexels.com/photos/814830/pexels-photo-814830.jpeg?cs=srgb&dl=pexels-evgeniy-grozev-814830.jpg&fm=jpg");
 			video4.setDescription("Alice's second video");
@@ -149,7 +149,7 @@ public class NexusApplication {
 
 			VideosEntity video5 = new VideosEntity();
 			video5.setVideoId("video005");
-			video5.setTitle("Bob Video 1");
+
 			video5.setThumbnail("https://images.unsplash.com/photo-1516117172878-fd2c41f4a759?fm=jpg&q=60");
 			video5.setDescription("Bob's construction project video");
 			video5.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4");
@@ -157,7 +157,7 @@ public class NexusApplication {
 
 			VideosEntity video6 = new VideosEntity();
 			video6.setVideoId("video006");
-			video6.setTitle("Bob Video 2");
+
 			video6.setThumbnail("https://images.unsplash.com/photo-1498050108023-c5249f4df085?fm=jpg&q=60");
 			video6.setDescription("Bob's second video");
 			video6.setVideoUrl(
@@ -166,7 +166,7 @@ public class NexusApplication {
 
 			VideosEntity video7 = new VideosEntity();
 			video7.setVideoId("video007");
-			video7.setTitle("Carol Video 1");
+
 			video7.setThumbnail("https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?fm=jpg&q=60");
 			video7.setDescription("Carol's superhero journey");
 			video7.setVideoUrl(
@@ -175,7 +175,7 @@ public class NexusApplication {
 
 			VideosEntity video8 = new VideosEntity();
 			video8.setVideoId("video008");
-			video8.setTitle("Carol Video 2");
+
 			video8.setThumbnail("https://images.unsplash.com/photo-1504198458649-3128b932f49b?fm=jpg&q=60");
 			video8.setDescription("Carol's second adventure");
 			video8.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
@@ -183,7 +183,7 @@ public class NexusApplication {
 
 			VideosEntity video9 = new VideosEntity();
 			video9.setVideoId("video009");
-			video9.setTitle("David Video 1");
+
 			video9.setThumbnail("https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?fm=jpg&q=60");
 			video9.setDescription("David's first vlog");
 			video9.setVideoUrl(
@@ -192,7 +192,7 @@ public class NexusApplication {
 
 			VideosEntity video10 = new VideosEntity();
 			video10.setVideoId("video010");
-			video10.setTitle("David Video 2");
+
 			video10.setThumbnail("https://images.unsplash.com/photo-1516979187457-637abb4f9353?fm=jpg&q=60");
 			video10.setDescription("David's travel video");
 			video10.setVideoUrl(
@@ -201,7 +201,7 @@ public class NexusApplication {
 
 			VideosEntity video11 = new VideosEntity();
 			video11.setVideoId("video011");
-			video11.setTitle("Eve Video 1");
+
 			video11.setThumbnail("https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?fm=jpg&q=60");
 			video11.setDescription("Eve's cooking tutorial");
 			video11.setVideoUrl(
@@ -210,7 +210,7 @@ public class NexusApplication {
 
 			VideosEntity video12 = new VideosEntity();
 			video12.setVideoId("video012");
-			video12.setTitle("Eve Video 2");
+
 			video12.setThumbnail("https://images.unsplash.com/photo-1520975698518-7e3d192a0f85?fm=jpg&q=60");
 			video12.setDescription("Eve's art vlog");
 			video12.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4");
@@ -218,7 +218,7 @@ public class NexusApplication {
 
 			VideosEntity video13 = new VideosEntity();
 			video13.setVideoId("video013");
-			video13.setTitle("Frank Video 1");
+
 			video13.setThumbnail("https://images.unsplash.com/photo-1504198453319-5ce911bafcde?fm=jpg&q=60");
 			video13.setDescription("Frank's action sequence");
 			video13.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4");
@@ -226,7 +226,7 @@ public class NexusApplication {
 
 			VideosEntity video14 = new VideosEntity();
 			video14.setVideoId("video014");
-			video14.setTitle("Frank Video 2");
+
 			video14.setThumbnail("https://images.unsplash.com/photo-1485217988980-11786ced9454?fm=jpg&q=60");
 			video14.setDescription("Frank's dramatic monologue");
 			video14.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4");
@@ -234,7 +234,7 @@ public class NexusApplication {
 
 			VideosEntity video15 = new VideosEntity();
 			video15.setVideoId("video015");
-			video15.setTitle("Grace Video 1");
+
 			video15.setThumbnail("https://images.unsplash.com/photo-1544005313-94ddf0286df2?fm=jpg&q=60");
 			video15.setDescription("Grace's tech talk");
 			video15.setVideoUrl(
@@ -243,7 +243,7 @@ public class NexusApplication {
 
 			VideosEntity video16 = new VideosEntity();
 			video16.setVideoId("video016");
-			video16.setTitle("Grace Video 2");
+
 			video16.setThumbnail("https://images.unsplash.com/photo-1517841905240-472988babdf9?fm=jpg&q=60");
 			video16.setDescription("Grace's tutorial");
 			video16.setVideoUrl("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4");
@@ -251,7 +251,7 @@ public class NexusApplication {
 
 			VideosEntity video17 = new VideosEntity();
 			video17.setVideoId("video017");
-			video17.setTitle("Henry Video 1");
+
 			video17.setThumbnail("https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?fm=jpg&q=60");
 			video17.setDescription("Henry's automotive review");
 			video17.setVideoUrl(
@@ -260,7 +260,7 @@ public class NexusApplication {
 
 			VideosEntity video18 = new VideosEntity();
 			video18.setVideoId("video018");
-			video18.setTitle("Henry Video 2");
+
 			video18.setThumbnail("https://images.unsplash.com/photo-1498579809087-0a43f7e9f50b?fm=jpg&q=60");
 			video18.setDescription("Henry's second automotive review");
 			video18.setVideoUrl(
@@ -268,7 +268,7 @@ public class NexusApplication {
 			video18.setUserId(user9.getUserId());
 			VideosEntity video19 = new VideosEntity();
 			video19.setVideoId("video019");
-			video19.setTitle("Alice Video 3");
+
 			video19.setThumbnail(
 					"https://images.pexels.com/photos/814830/pexels-photo-814830.jpeg?cs=srgb&dl=pexels-evgeniy-grozev-814830.jpg&fm=jpg");
 			video19.setDescription("Alice's third video");

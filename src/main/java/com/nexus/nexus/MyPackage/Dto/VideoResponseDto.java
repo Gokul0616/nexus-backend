@@ -12,7 +12,6 @@ public class VideoResponseDto {
     private String videoId;
     private String videoSource;
     private String username;
-    private String title;
     private String caption;
     private int likes;
     private int comments;

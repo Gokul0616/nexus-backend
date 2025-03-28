@@ -1,8 +1,6 @@
 package com.nexus.nexus.MyPackage.Controllers;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +25,6 @@ import com.nexus.nexus.MyPackage.Dto.OtherUserProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UserProfileDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
-import com.nexus.nexus.MyPackage.Entities.VideoLike;
-import com.nexus.nexus.MyPackage.Entities.VideosEntity;
 import com.nexus.nexus.MyPackage.Repository.FollowRepository;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
 import com.nexus.nexus.MyPackage.Repository.VideosRepository;
@@ -60,7 +56,7 @@ public class UserController {
 
     @PostMapping("/auth/signin")
     public ResponseEntity<AuthenticationResponse> signin(@RequestBody AuthenticationDto authDto) {
-        System.out.println("authDto: " + authDto.getLogin() + " " + authDto.getPassword());
+        System.out.println(authDto.getLogin());
         String token = myUserServices.authenticate(authDto);
         return ResponseEntity.ok(new AuthenticationResponse(token, "Login Successful"));
     }
