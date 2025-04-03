@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.nexus.nexus.MyPackage.Dto.VideoRequestDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideoLike;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
@@ -38,6 +39,22 @@ public class PostServices {
         videoLike.setVideo(video);
         videoLike.setLikedAt(LocalDateTime.now());
         videoLikeRepository.save(videoLike);
+    }
+
+    public String saveVideo(UserModal user, VideoRequestDto videoDto) {
+
+        VideosEntity video = new VideosEntity();
+        video.setVideoId(videoDto.getVideoId());
+        video.setUserId(user.getUserId());
+        video.setVideoUrl(videoDto.getVideoUrl());
+        video.setThumbnail(videoDto.getThumbnailUrl());
+        video.setDescription(videoDto.getDescription());
+        video.setCategory(videoDto.getCategory());
+        video.setTags(videoDto.getTags());
+        video.setStatus("active");
+
+        videosRepository.save(video);
+        return "Video saved successfully!";
     }
 
     public void removeLikeVideo(UserModal user, VideosEntity video) {

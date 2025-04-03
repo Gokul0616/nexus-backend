@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nexus.nexus.MyPackage.Dto.LikeRequest;
+import com.nexus.nexus.MyPackage.Dto.VideoRequestDto;
 import com.nexus.nexus.MyPackage.Dto.VideoResponseDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
@@ -31,6 +32,13 @@ public class PostController {
     private final PostServices postServices;
     private final UserRepository userRepository;
     private final VideosRepository videosRepository;
+
+    @PostMapping("/savePost")
+    public ResponseEntity<?> savePost(@RequestBody VideoRequestDto videoDto, Authentication authentication) {
+        UserModal user = (UserModal) authentication.getPrincipal();
+
+        return ResponseEntity.ok(postServices.saveVideo(user, videoDto));
+    }
 
     @GetMapping("/getRecommendation")
     public ResponseEntity<List<VideoResponseDto>> getRecommendation(Authentication authentication) {

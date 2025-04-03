@@ -81,7 +81,8 @@ public class UserController {
     }
 
     @GetMapping("/profile/{username}")
-    public ResponseEntity<OtherUserProfileDto> getUserProfileByUsername(@PathVariable String username,
+    public ResponseEntity<OtherUserProfileDto> getUserProfileByUsername(
+            @PathVariable(name = "username") String username,
             Authentication authentication) {
 
         return myUserServices.getOtherUserProfile(authentication, username);

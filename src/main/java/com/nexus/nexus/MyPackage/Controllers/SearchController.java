@@ -30,7 +30,8 @@ public class SearchController {
     }
 
     @GetMapping
-    public ResponseEntity<?> search(@RequestParam String query, @RequestParam String type) {
+    public ResponseEntity<?> search(@RequestParam(name = "query") String query,
+            @RequestParam(name = "type") String type) {
         if ("users".equalsIgnoreCase(type)) {
             List<UserSearchResultDto> users = myUserServices.searchUsers(query);
             return ResponseEntity.ok(users);
@@ -51,8 +52,8 @@ public class SearchController {
                         myUserServices.getUsernameByUserId(video.getUserId()),
                         video.getDescription(),
                         video.getLikes() != null ? video.getLikes().size() : 0,
-                        0, // comments count (update as needed)
-                        0, // shares count (update as needed)
+                        0,
+                        0,
                         video.getUserId(),
                         "",
                         video.getThumbnail(),

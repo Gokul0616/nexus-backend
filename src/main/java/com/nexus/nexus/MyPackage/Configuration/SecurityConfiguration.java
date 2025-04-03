@@ -28,7 +28,8 @@ public class SecurityConfiguration {
                                                 // Allow error dispatch requests regardless of authentication
                                                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                                 // Permit /error endpoint explicitly
-                                                .requestMatchers("/user/test", "/user/auth/**", "/images/**")
+                                                .requestMatchers("/user/test", "/user/auth/**", "/images/**",
+                                                                "/posts/**")
                                                 .permitAll()
 
                                                 .anyRequest().authenticated())
