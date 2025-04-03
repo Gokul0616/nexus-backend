@@ -14,4 +14,8 @@ public interface VideoLikeRepository extends JpaRepository<VideoLike, Long> {
     VideoLike findByUserAndVideo(UserModal user, VideosEntity video);
 
     List<VideoLike> findByUser(UserModal user);
+
+    List<VideoLike> findAllByUser(UserModal user);
+
+    boolean existsByUser(UserModal currentUser);
 }
