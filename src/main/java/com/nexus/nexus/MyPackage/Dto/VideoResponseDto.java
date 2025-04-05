@@ -21,4 +21,5 @@ public class VideoResponseDto {
     private String thumbnail;
     private String profilePic;
     private boolean likedByCurrentUser;
+    private boolean followedByCurrentUser;
 }

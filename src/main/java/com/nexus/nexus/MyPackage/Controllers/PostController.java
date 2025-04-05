@@ -24,6 +24,7 @@ import com.nexus.nexus.MyPackage.Repository.UserRepository;
 import com.nexus.nexus.MyPackage.Repository.VideoLikeRepository;
 import com.nexus.nexus.MyPackage.Repository.VideosRepository;
 import com.nexus.nexus.MyPackage.Services.PostServices;
+import com.nexus.nexus.MyPackage.Services.RecommendationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,7 @@ public class PostController {
     private final UserRepository userRepository;
     private final VideosRepository videosRepository;
     private final VideoLikeRepository videoLikeRepository;
+    private final RecommendationService recommendationService;
 
     @PostMapping("/savePost")
     public ResponseEntity<?> savePost(@RequestBody VideoRequestDto videoDto, Authentication authentication) {
@@ -72,83 +74,90 @@ public class PostController {
                     "Original Sound",
                     video.getThumbnail(),
                     profilePic,
-                    likedByCurrentUser);
+                    likedByCurrentUser, false);
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/recommendations")
-    public ResponseEntity<List<VideoResponseDto>> getRecommendations(
-            Authentication authentication,
-            @RequestParam(name = "strategy", defaultValue = "hybrid") String strategy,
-            @RequestParam(name = "limit", defaultValue = "20") int limit) {
+    // @GetMapping("/recommendations")
+    // public ResponseEntity<List<VideoResponseDto>> getRecommendations(
+    // Authentication authentication,
+    // @RequestParam(name = "strategy", defaultValue = "hybrid") String strategy,
+    // @RequestParam(name = "limit", defaultValue = "20") int limit) {
 
-        Object principal = authentication.getPrincipal();
-        if (!(principal instanceof UserModal)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        UserModal currentUser = (UserModal) principal;
+    // Object principal = authentication.getPrincipal();
+    // if (!(principal instanceof UserModal)) {
+    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    // }
+    // UserModal currentUser = (UserModal) principal;
+    // List<VideosEntity> recommendedVideos;
 
-        List<VideosEntity> recommendedVideos;
+    // // Check if the user has any interaction history
+    // boolean hasInteractionHistory =
+    // videoLikeRepository.existsByUser(currentUser);
+    // if (!hasInteractionHistory) {
+    // // Cold Start: New user
+    // recommendedVideos = recommendationService.getNewUserRecommendations(limit);
+    // } else {
+    // switch (strategy.toLowerCase()) {
+    // case "trending":
+    // recommendedVideos = recommendationService.getTrendingVideos(limit);
+    // break;
+    // case "collaborative":
+    // recommendedVideos =
+    // recommendationService.getCollaborativeRecommendations(currentUser, limit);
+    // break;
+    // case "content-based":
+    // recommendedVideos =
+    // recommendationService.getContentBasedRecommendations(currentUser, limit);
+    // break;
+    // case "watch-based":
+    // recommendedVideos =
+    // recommendationService.getWatchBasedRecommendations(currentUser, limit);
+    // break;
+    // case "advanced":
+    // recommendedVideos =
+    // recommendationService.getAdvancedRecommendations(currentUser, limit);
+    // break;
+    // case "hybrid":
+    // default:
+    // recommendedVideos =
+    // recommendationService.getHybridRecommendations(currentUser, limit);
+    // break;
+    // }
+    // }
 
-        // Check if the user has any interaction history
-        boolean hasInteractionHistory = videoLikeRepository.existsByUser(currentUser);
+    // List<VideoResponseDto> response = recommendedVideos.stream().map(video -> {
+    // Optional<UserModal> userOptional =
+    // userRepository.findByUserId(video.getUserId());
+    // String username = userOptional.map(UserModal::getUsername).orElse("Unknown");
+    // String profilePic = userOptional.map(UserModal::getProfilePic).orElse(null);
+    // boolean likedByCurrentUser = video.getLikes() != null &&
+    // video.getLikes().stream()
+    // .anyMatch(like -> like.getUser().getId() == currentUser.getId());
+    // return new VideoResponseDto(
+    // String.valueOf(video.getId()),
+    // video.getVideoId(),
+    // video.getVideoUrl(),
+    // username,
+    // video.getDescription(),
+    // video.getLikes() != null ? video.getLikes().size() : 0,
+    // 0,
+    // 0,
+    // video.getUserId(),
+    // "Original Sound",
+    // video.getThumbnail(),
+    // profilePic,
+    // likedByCurrentUser);
+    // }).collect(Collectors.toList());
 
-        if (!hasInteractionHistory) {
-            // Cold Start: New user with no interaction history
-            recommendedVideos = postServices.getTrendingVideos(limit);
-        } else {
-            // Existing user with interaction history
-            switch (strategy.toLowerCase()) {
-                case "trending":
-                    recommendedVideos = postServices.getTrendingVideos(limit);
-                    break;
-                case "collaborative":
-                    recommendedVideos = postServices.getCollaborativeRecommendations(currentUser, limit);
-                    break;
-                case "content-based":
-                    recommendedVideos = postServices.getContentBasedRecommendations(currentUser, limit);
-                    break;
-                case "hybrid":
-                default:
-                    recommendedVideos = postServices.getHybridRecommendations(currentUser, limit);
-                    break;
-            }
-        }
+    // if (response.isEmpty()) {
+    // return ResponseEntity.noContent().build();
+    // }
 
-        List<VideoResponseDto> response = recommendedVideos.stream().map(video -> {
-            Optional<UserModal> userOptional = userRepository.findByUserId(video.getUserId());
-            String username = userOptional.map(UserModal::getUsername).orElse("Unknown");
-            String profilePic = userOptional.map(UserModal::getProfilePic).orElse(null);
-
-            boolean likedByCurrentUser = false;
-            if (video.getLikes() != null) {
-                likedByCurrentUser = video.getLikes().stream()
-                        .anyMatch(like -> like.getUser().getId() == currentUser.getId());
-            }
-            return new VideoResponseDto(
-                    String.valueOf(video.getId()),
-                    video.getVideoId(),
-                    video.getVideoUrl(),
-                    username,
-                    video.getDescription(),
-                    video.getLikes() != null ? video.getLikes().size() : 0,
-                    0,
-                    0,
-                    video.getUserId(),
-                    "Original Sound",
-                    video.getThumbnail(),
-                    profilePic,
-                    likedByCurrentUser);
-        }).collect(Collectors.toList());
-
-        if (response.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(response);
-    }
+    // return ResponseEntity.ok(response);
+    // }
 
     @PostMapping("/addLike")
     public ResponseEntity<String> addLike(@RequestBody LikeRequest request, Authentication authentication) {

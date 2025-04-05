@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import com.nexus.nexus.MyPackage.Dto.VideoRequestDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideoLike;
+import com.nexus.nexus.MyPackage.Entities.VideoWatch;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
 import com.nexus.nexus.MyPackage.Repository.VideoLikeRepository;
+import com.nexus.nexus.MyPackage.Repository.VideoWatchRepository;
 import com.nexus.nexus.MyPackage.Repository.VideosRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class PostServices {
     private final VideosRepository videosRepository;
     private final VideoLikeRepository videoLikeRepository;
     private final UserRepository userRepo;
+    private final VideoWatchRepository videoWatchRepository;
 
     /**
      * Default recommendation fallback (if no user data is available)
@@ -203,6 +206,25 @@ public class PostServices {
         return new ArrayList<>(hybridRecommendations).stream()
                 .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    public List<VideosEntity> getWatchBasedRecommendations(UserModal user, int limit) {
+        // Fetch watch records for the current user
+        List<VideoWatch> watchRecords = videoWatchRepository.findAllByUser(user);
+
+        // Create a map of videoId to the count of fully watched occurrences
+        Map<String, Long> fullWatchCount = watchRecords.stream()
+                .filter(VideoWatch::isFullyWatched)
+                .collect(Collectors.groupingBy(VideoWatch::getVideoId, Collectors.counting()));
+
+        // Retrieve all videos and filter based on watch counts
+        List<VideosEntity> recommendedVideos = videosRepository.findAll().stream()
+                .filter(video -> fullWatchCount.containsKey(video.getVideoId()))
+                .sorted((v1, v2) -> Long.compare(fullWatchCount.get(v2.getVideoId()),
+                        fullWatchCount.get(v1.getVideoId())))
+                .limit(limit)
+                .collect(Collectors.toList());
+        return recommendedVideos;
     }
 
     public boolean isVideoLikedByUser(UserModal user, VideosEntity video) {

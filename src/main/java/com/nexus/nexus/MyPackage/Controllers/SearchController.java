@@ -58,7 +58,7 @@ public class SearchController {
                         "",
                         video.getThumbnail(),
                         myUserServices.getProfilePicByUserId(video.getUserId()),
-                        likedByCurrentUser);
+                        likedByCurrentUser, false);
             }).collect(Collectors.toList());
             return ResponseEntity.ok(result);
         } else {

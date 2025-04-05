@@ -56,7 +56,6 @@ public class UserController {
 
     @PostMapping("/auth/signin")
     public ResponseEntity<AuthenticationResponse> signin(@RequestBody AuthenticationDto authDto) {
-        System.out.println(authDto.getLogin());
         String token = myUserServices.authenticate(authDto);
         return ResponseEntity.ok(new AuthenticationResponse(token, "Login Successful"));
     }
@@ -105,7 +104,6 @@ public class UserController {
         String normalizedEmail = email.toLowerCase().trim();
 
         if (myUserServices.existsByEmail(normalizedEmail)) {
-            System.out.println("Email found: " + normalizedEmail);
             myUserServices.sendResetInstructions(normalizedEmail);
             return ResponseEntity.ok("Password reset instructions sent to " + normalizedEmail);
         } else {
