@@ -72,26 +72,38 @@ public class StoryService {
 
     }
 
-    public List<StoryDto> getStoriesForFollowedUsers(String userId) {
-        List<String> followedUserIds = followRepository.findFollowedUserIdsByUserId(userId);
+    public List<StoryDto> getStoriesForFollowedUsers(String currentUserId) {
+        // Get the list of user IDs that the current user follows.
+        List<String> followedUserIds = followRepository.findFollowedUserIdsByUserId(currentUserId);
+
+        // Option 1: Ensure current user's ID is in the list.
+        // (This works if you want to simply combine the current user's story with
+        // followed stories)
+        if (!followedUserIds.contains(currentUserId)) {
+            followedUserIds.add(currentUserId);
+        }
+
+        // Fetch all stories from these users.
         List<Story> stories = storyRepository.findByUserIdIn(followedUserIds);
 
-        // Group stories by userId
+        // Group stories by userId.
         Map<String, List<Story>> groupedByUser = stories.stream()
                 .collect(Collectors.groupingBy(Story::getUserId));
 
+        // Map each group to a StoryDto.
         return groupedByUser.entrySet().stream().map(entry -> {
             String storyUserId = entry.getKey();
             List<Story> userStories = entry.getValue();
 
             Optional<UserModal> user = userRepository.findByUserId(storyUserId);
 
+            // Map each Story to a SlideDto.
             List<SlideDto> slides = userStories.stream()
                     .map(story -> {
                         boolean isViewed = story.getViews().stream()
-                                .anyMatch(view -> view.getUserId().equals(userId));
+                                .anyMatch(view -> view.getUserId().equals(currentUserId));
                         return new SlideDto(
-                                story.getId(),
+                                story.getId(), // Pass slide id (story id)
                                 story.getType(),
                                 story.getMediaUrl(),
                                 story.getViews(),
@@ -101,7 +113,7 @@ public class StoryService {
 
             return new StoryDto(
                     storyUserId,
-                    user.get().getUsername(),
+                    user.map(UserModal::getUsername).orElse(""),
                     user.map(UserModal::getProfilePic).orElse(""),
                     slides);
         }).collect(Collectors.toList());

@@ -63,9 +63,8 @@ public class StoryController {
     @GetMapping
     public ResponseEntity<List<StoryDto>> getFollowedStories(Authentication authentication) {
         UserModal userDetails = (UserModal) authentication.getPrincipal();
-        String userId = userDetails.getUserId(); // Adjust based on your user details
-
-        List<StoryDto> stories = storyService.getStoriesForFollowedUsers(userId);
+        String currentUserId = userDetails.getUserId();
+        List<StoryDto> stories = storyService.getStoriesForFollowedUsers(currentUserId);
         return ResponseEntity.ok(stories);
     }
 
