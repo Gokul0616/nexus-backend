@@ -14,6 +14,7 @@ import com.nexus.nexus.MyPackage.Dto.UserSearchResultDto;
 import com.nexus.nexus.MyPackage.Dto.VideoResponseDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
+import com.nexus.nexus.MyPackage.Enums.VideoType;
 import com.nexus.nexus.MyPackage.Services.MyUserServices;
 import com.nexus.nexus.MyPackage.Services.PostServices;
 
@@ -57,6 +58,7 @@ public class SearchController {
                         video.getUserId(),
                         "",
                         video.getThumbnail(),
+                        video.getType(),
                         myUserServices.getProfilePicByUserId(video.getUserId()),
                         likedByCurrentUser, false);
             }).collect(Collectors.toList());

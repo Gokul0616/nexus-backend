@@ -2,16 +2,22 @@ package com.nexus.nexus.MyPackage.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.nexus.nexus.MyPackage.Dto.FollowRequest;
 import com.nexus.nexus.MyPackage.Services.FollowService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/follow")
+@RequiredArgsConstructor
 public class FollowController {
 
-    @Autowired
-    private FollowService followService;
+    private final FollowService followService;
 
     @PostMapping("/toggleFollow")
     public ResponseEntity<String> toggleFollow(@RequestBody FollowRequest followRequest) {

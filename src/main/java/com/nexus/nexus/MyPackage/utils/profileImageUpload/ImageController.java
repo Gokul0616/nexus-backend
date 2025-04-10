@@ -39,7 +39,7 @@ public class ImageController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile image,
+    public ResponseEntity<?> uploadImage(@RequestParam(name = "image") MultipartFile image,
             HttpServletRequest request) {
         try {
 
@@ -78,8 +78,8 @@ public class ImageController {
     }
 
     @GetMapping("/{username}/{fileName:.+}")
-    public ResponseEntity<Resource> serveImage(@PathVariable String username,
-            @PathVariable String fileName) {
+    public ResponseEntity<Resource> serveImage(@PathVariable(name = "username") String username,
+            @PathVariable(name = "fileName") String fileName) {
         try {
             Path userDir = UPLOAD_DIR.resolve(username);
             Path filePath = userDir.resolve(fileName);

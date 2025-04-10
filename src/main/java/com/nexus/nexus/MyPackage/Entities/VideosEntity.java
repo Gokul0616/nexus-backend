@@ -6,9 +6,13 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.nexus.nexus.MyPackage.Enums.VideoType;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,6 +36,9 @@ public class VideosEntity {
     private String description;
     private String thumbnail;
     private String videoUrl;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true) // Not mandatory
+    private VideoType type = VideoType.VIDEO;
     private String category;
     private String tags;
     private String status;

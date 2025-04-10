@@ -45,23 +45,20 @@ public class RecommendationService {
      * Recommendation for new users (cold start) based on trending and diversity.
      * This strategy considers recency, overall popularity and a bit of randomness.
      */
-    public List<VideosEntity> getNewUserRecommendations(int limit) {
-        // Trending videos sorted by like count and recency
+    public List<VideosEntity> getNewUserRecommendations(int offset, int limit) {
         List<VideosEntity> trending = videosRepository.findAll().stream()
                 .sorted((v1, v2) -> {
-                    // Combine likes and recency (assumes VideosEntity has a createdAt property)
-                    long likesDiff = v2.getLikes() != null ? v2.getLikes().size()
-                            : 0L -
-                                    (v1.getLikes() != null ? v1.getLikes().size() : 0L);
+                    long likesDiff = (v2.getLikes() != null ? v2.getLikes().size() : 0)
+                            - (v1.getLikes() != null ? v1.getLikes().size() : 0);
                     long daysDiff = ChronoUnit.DAYS.between(v2.getCreatedAt(), v1.getCreatedAt());
                     return Long.compare(likesDiff + daysDiff, 0);
                 })
-                .limit(limit * 2) // take more than limit to allow for later diversification
                 .collect(Collectors.toList());
 
-        // Shuffle for diversity and pick the final list
         Collections.shuffle(trending);
-        return trending.stream().limit(limit).collect(Collectors.toList());
+        if (offset >= trending.size())
+            return Collections.emptyList();
+        return trending.subList(offset, Math.min(offset + limit, trending.size()));
     }
 
     /**
@@ -283,6 +280,37 @@ public class RecommendationService {
 
         // Return the top 'limit' recommendations.
         return sortedRecommendations.stream().limit(limit).collect(Collectors.toList());
+    }
+
+    public List<VideosEntity> getPaginatedRecommendations(UserModal user, String strategy, int offset, int limit) {
+        List<VideosEntity> fullList;
+
+        switch (strategy.toLowerCase()) {
+            case "trending":
+                fullList = getTrendingVideos(offset + limit);
+                break;
+            case "collaborative":
+                fullList = getCollaborativeRecommendations(user, offset + limit);
+                break;
+            case "content-based":
+                fullList = getContentBasedRecommendations(user, offset + limit);
+                break;
+            case "watch-based":
+                fullList = getWatchBasedRecommendations(user, offset + limit);
+                break;
+            case "advanced":
+                fullList = getAdvancedRecommendations(user, offset + limit);
+                break;
+            case "hybrid":
+            default:
+                fullList = getHybridRecommendations(user, offset + limit);
+                break;
+        }
+
+        if (offset >= fullList.size())
+            return Collections.emptyList();
+
+        return fullList.subList(offset, Math.min(offset + limit, fullList.size()));
     }
 
     /**

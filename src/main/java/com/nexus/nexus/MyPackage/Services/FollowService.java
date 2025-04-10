@@ -8,14 +8,15 @@ import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Repository.FollowRepository;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class FollowService {
 
-    @Autowired
-    private FollowRepository followRepository;
+    private final FollowRepository followRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public boolean toggleFollow(String followerUserId, String followeeUserId) throws Exception {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nexus.nexus.MyPackage.Dto.AdVideoResponseDto;
 import com.nexus.nexus.MyPackage.Dto.VideoResponseDto;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
@@ -32,23 +33,25 @@ public class RecommendationController {
     private final FollowRepository followRepository;
 
     @GetMapping
-    public ResponseEntity<List<VideoResponseDto>> getRecommendations(
+    public ResponseEntity<List<?>> getRecommendations(
             Authentication authentication,
             @RequestParam(name = "strategy", defaultValue = "hybrid") String strategy,
+            @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "limit", defaultValue = "20") int limit) {
 
         Object principal = authentication.getPrincipal();
         if (!(principal instanceof UserModal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        int offset = page * limit;
+
         UserModal currentUser = (UserModal) principal;
         List<VideosEntity> recommendedVideos;
 
         // Check if the user has any interaction history
         boolean hasInteractionHistory = videoLikeRepository.existsByUser(currentUser);
         if (!hasInteractionHistory) {
-            // Cold Start: New user
-            recommendedVideos = recommendationService.getNewUserRecommendations(limit);
+            recommendedVideos = recommendationService.getNewUserRecommendations(offset, limit);
         } else {
             switch (strategy.toLowerCase()) {
                 case "trending":
@@ -73,31 +76,45 @@ public class RecommendationController {
             }
         }
 
-        List<VideoResponseDto> response = recommendedVideos.stream().map(video -> {
-            Optional<UserModal> userOptional = userRepository.findByUserId(video.getUserId());
-            String username = userOptional.map(UserModal::getUsername).orElse("Unknown");
-            String profilePic = userOptional.map(UserModal::getProfilePic).orElse(null);
-            boolean likedByCurrentUser = video.getLikes() != null && video.getLikes().stream()
-                    .anyMatch(like -> like.getUser().getId() == currentUser.getId());
-            boolean isFollowing = false;
+        List<Object> response = recommendedVideos.stream().map(video -> {
+            if ("ad".equalsIgnoreCase(video.getType().toString())) {
+                return new AdVideoResponseDto(
+                        String.valueOf(video.getId()),
+                        video.getVideoId(),
+                        video.getVideoUrl(),
+                        video.getThumbnail(),
+                        video.getDescription(), // Assuming it's adTitle
+                        "Check this out!", // adDescription placeholder
+                        "Shop Now", // callToAction placeholder
+                        "Advertiser Name", // Placeholder
+                        "https://example.com/advertiser-pic.jpg", // Placeholder
+                        "ad");
+            } else {
+                Optional<UserModal> userOptional = userRepository.findByUserId(video.getUserId());
+                String username = userOptional.map(UserModal::getUsername).orElse("Unknown");
+                String profilePic = userOptional.map(UserModal::getProfilePic).orElse(null);
+                boolean likedByCurrentUser = video.getLikes() != null && video.getLikes().stream()
+                        .anyMatch(like -> like.getUser().getId() == currentUser.getId());
+                boolean isFollowing = followRepository.existsByFollower_UserIdAndFollowee_UserId(
+                        currentUser.getUserId(), video.getUserId());
 
-            isFollowing = followRepository.existsByFollower_UserIdAndFollowee_UserId(
-                    currentUser.getUserId(), video.getUserId());
-
-            return new VideoResponseDto(
-                    String.valueOf(video.getId()),
-                    video.getVideoId(),
-                    video.getVideoUrl(),
-                    username,
-                    video.getDescription(),
-                    video.getLikes() != null ? video.getLikes().size() : 0,
-                    0,
-                    0,
-                    video.getUserId(),
-                    "Original Sound",
-                    video.getThumbnail(),
-                    profilePic,
-                    likedByCurrentUser, isFollowing);
+                return new VideoResponseDto(
+                        String.valueOf(video.getId()),
+                        video.getVideoId(),
+                        video.getVideoUrl(),
+                        username,
+                        video.getDescription(),
+                        video.getLikes() != null ? video.getLikes().size() : 0,
+                        0,
+                        0,
+                        video.getUserId(),
+                        "Original Sound",
+                        video.getThumbnail(),
+                        video.getType(),
+                        profilePic,
+                        likedByCurrentUser,
+                        isFollowing);
+            }
         }).collect(Collectors.toList());
 
         if (response.isEmpty()) {

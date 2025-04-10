@@ -29,6 +29,7 @@ public class SecurityConfiguration {
                                                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                                                 // Permit /error endpoint explicitly
                                                 .requestMatchers("/user/test", "/user/auth/**", "/images/**",
+                                                                "/stories/media/**",
                                                                 "/posts/**")
                                                 .permitAll()
 

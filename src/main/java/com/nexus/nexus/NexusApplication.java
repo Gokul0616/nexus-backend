@@ -12,15 +12,18 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.nexus.nexus.MyPackage.Entities.Follow;
 import com.nexus.nexus.MyPackage.Entities.UserModal;
 import com.nexus.nexus.MyPackage.Entities.VideosEntity;
+import com.nexus.nexus.MyPackage.Enums.VideoType;
 import com.nexus.nexus.MyPackage.Repository.FollowRepository;
 import com.nexus.nexus.MyPackage.Repository.UserRepository;
 import com.nexus.nexus.MyPackage.Repository.VideosRepository;
 
 @SpringBootApplication
+@EnableScheduling
 public class NexusApplication {
 
 	public static void main(String[] args) {

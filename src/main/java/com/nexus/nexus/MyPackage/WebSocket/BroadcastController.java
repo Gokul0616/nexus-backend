@@ -22,5 +22,4 @@ public class BroadcastController {
                 particularUser.getMessage());
         return message;
     }
-
 }

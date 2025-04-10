@@ -12,11 +12,17 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.nexus.nexus.MyPackage.Entities.Story;
+
 public class MyWebSocketHandler extends TextWebSocketHandler {
     // A thread-safe map to store sessions by user ID.
     private static final Map<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
     // Additionally, you may still keep a set for broadcasting if needed.
     private static final Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -79,6 +85,15 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
             System.err.println("Session for user " + userId + " not found or closed.");
             // So her us epush notification
             return "Session for user " + userId + " not found or closed.";
+        }
+    }
+
+    public static void sendNewStory(Story story) {
+        try {
+            String storyJson = objectMapper.writeValueAsString(story);
+            broadcast("NEW_STORY:" + storyJson);
+        } catch (IOException e) {
+            System.err.println("Failed to serialize Story to JSON: " + e.getMessage());
         }
     }
 }

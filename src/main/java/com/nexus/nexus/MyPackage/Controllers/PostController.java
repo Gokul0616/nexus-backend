@@ -73,6 +73,7 @@ public class PostController {
                     video.getUserId(),
                     "Original Sound",
                     video.getThumbnail(),
+                    video.getType(),
                     profilePic,
                     likedByCurrentUser, false);
         }).collect(Collectors.toList());

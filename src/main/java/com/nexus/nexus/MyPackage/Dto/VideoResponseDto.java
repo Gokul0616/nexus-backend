@@ -1,5 +1,7 @@
 package com.nexus.nexus.MyPackage.Dto;
 
+import com.nexus.nexus.MyPackage.Enums.VideoType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +21,7 @@ public class VideoResponseDto {
     private String userId;
     private String musicTitle;
     private String thumbnail;
+    private VideoType videoType;
     private String profilePic;
     private boolean likedByCurrentUser;
     private boolean followedByCurrentUser;
