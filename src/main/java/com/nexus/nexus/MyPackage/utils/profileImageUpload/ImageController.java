@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("images")
 public class ImageController {
     private final JwtRequestUtil jwtUtil;
-    private final ImageService imageService;
     private static final Path UPLOAD_DIR = Paths.get("uploads", "profileImage");
 
     static {

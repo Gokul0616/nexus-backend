@@ -12,11 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "story_views")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class StoryView {
 
     @Id
@@ -32,16 +36,5 @@ public class StoryView {
     @JoinColumn(name = "story_id", nullable = false)
     @JsonIgnore
     private Story story;
-
-    public StoryView() {
-    }
-
-    public StoryView(String userId, String username, String profilePic, LocalDateTime viewedAt, Story story) {
-        this.userId = userId;
-        this.username = username;
-        this.profilePic = profilePic;
-        this.viewedAt = viewedAt;
-        this.story = story;
-    }
 
 }

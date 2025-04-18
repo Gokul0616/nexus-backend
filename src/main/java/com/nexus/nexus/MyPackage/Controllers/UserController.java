@@ -20,6 +20,7 @@ import com.nexus.nexus.MyPackage.Configuration.JwtRequestUtil;
 import com.nexus.nexus.MyPackage.Configuration.UserInfoService;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationDto;
 import com.nexus.nexus.MyPackage.Dto.AuthenticationResponse;
+import com.nexus.nexus.MyPackage.Dto.FCMTokenDTO;
 import com.nexus.nexus.MyPackage.Dto.ForgotPasswordRequest;
 import com.nexus.nexus.MyPackage.Dto.OtherUserProfileDto;
 import com.nexus.nexus.MyPackage.Dto.UploadProfileDto;
@@ -110,6 +111,14 @@ public class UserController {
             System.out.println("Email not found: " + normalizedEmail);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
         }
+    }
+
+    @PostMapping("/saveFcmToken")
+    public ResponseEntity<String> saveFCMToken(@RequestBody FCMTokenDTO request, Authentication authentication) {
+        UserModal user = (UserModal) authentication.getPrincipal();
+        user.setFcmToken(request.getFcmToken());
+        userRepository.save(user);
+        return ResponseEntity.ok("FCM token saved successfully");
     }
 
     @PostMapping("/auth/authenticate")

@@ -18,5 +18,5 @@ public class SlideDto {
     private String uri;
     private List<StoryView> views = new ArrayList<>();
     private boolean isViewed;
-
+    private String placement;
 }

@@ -36,11 +36,20 @@ public class StoryService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final StoryViewRepository storyViewRepository;
+    private static final Path BASE_UPLOAD_DIR = Paths.get("uploads", "Story");
 
-    public Story saveStory(MultipartFile file, String userId) throws IOException {
+    static {
+        try {
+            Files.createDirectories(BASE_UPLOAD_DIR);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create base upload directory", e);
+        }
+    }
+
+    public Story saveStory(MultipartFile file, String userId, String placement) throws IOException {
 
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        Path uploadDir = Paths.get("uploads", "Story", userId);
+        Path uploadDir = Paths.get(BASE_UPLOAD_DIR.toString(), userId);
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
@@ -67,47 +76,42 @@ public class StoryService {
         story.setType(type);
         story.setCreatedAt(LocalDateTime.now());
         story.setExpireAt(LocalDateTime.now().plusHours(24));
+        story.setPlacement(placement);
 
         return storyRepository.save(story);
 
     }
 
     public List<StoryDto> getStoriesForFollowedUsers(String currentUserId) {
-        // Get the list of user IDs that the current user follows.
+
         List<String> followedUserIds = followRepository.findFollowedUserIdsByUserId(currentUserId);
 
-        // Option 1: Ensure current user's ID is in the list.
-        // (This works if you want to simply combine the current user's story with
-        // followed stories)
         if (!followedUserIds.contains(currentUserId)) {
             followedUserIds.add(currentUserId);
         }
 
-        // Fetch all stories from these users.
         List<Story> stories = storyRepository.findByUserIdIn(followedUserIds);
 
-        // Group stories by userId.
         Map<String, List<Story>> groupedByUser = stories.stream()
                 .collect(Collectors.groupingBy(Story::getUserId));
 
-        // Map each group to a StoryDto.
         return groupedByUser.entrySet().stream().map(entry -> {
             String storyUserId = entry.getKey();
             List<Story> userStories = entry.getValue();
 
             Optional<UserModal> user = userRepository.findByUserId(storyUserId);
 
-            // Map each Story to a SlideDto.
             List<SlideDto> slides = userStories.stream()
                     .map(story -> {
                         boolean isViewed = story.getViews().stream()
                                 .anyMatch(view -> view.getUserId().equals(currentUserId));
                         return new SlideDto(
-                                story.getId(), // Pass slide id (story id)
+                                story.getId(),
                                 story.getType(),
                                 story.getMediaUrl(),
                                 story.getViews(),
-                                isViewed);
+                                isViewed,
+                                story.getPlacement());
                     })
                     .collect(Collectors.toList());
 
@@ -150,19 +154,18 @@ public class StoryService {
         if (storyOpt.isPresent()) {
             Story story = storyOpt.get();
 
-            // Check if already viewed (optional logic to avoid duplicates)
             boolean alreadyViewed = story.getViews().stream()
                     .anyMatch(view -> view.getUserId().equals(viewer.getUserId()));
 
             if (!alreadyViewed) {
-                StoryView view = new StoryView(
+                StoryView view = new StoryView(null,
                         viewer.getUserId(),
                         viewer.getUsername(),
                         viewer.getProfilePic(),
                         LocalDateTime.now(),
                         story);
                 story.getViews().add(view);
-                storyRepository.save(story); // Will cascade the new view
+                storyRepository.save(story);
             }
         }
     }

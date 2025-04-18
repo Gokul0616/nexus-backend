@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,9 +39,12 @@ public class UserModal implements UserDetails {
 
     @Column(unique = true)
     private String username;
-
+    @JsonIgnore
     private String email;
+    @JsonIgnore
     private String password;
+    @JsonIgnore
+    private String fcmToken;
     private String role;
     private String status;
     private String bio;

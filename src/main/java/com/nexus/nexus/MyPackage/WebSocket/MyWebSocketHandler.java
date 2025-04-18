@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,9 +16,14 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nexus.nexus.MyPackage.Entities.Story;
+import com.nexus.nexus.MyPackage.MessagingServices.ChatRoomService;
+import com.nexus.nexus.MyPackage.WebSocket.Dto.ChatMessageDTO;
 
 public class MyWebSocketHandler extends TextWebSocketHandler {
     // A thread-safe map to store sessions by user ID.
+
+    @Autowired
+    private ChatRoomService chatRoomService;
     private static final Map<String, WebSocketSession> userSessions = new ConcurrentHashMap<>();
     // Additionally, you may still keep a set for broadcasting if needed.
     private static final Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
@@ -38,10 +44,46 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        // Echo back the received message (or add your custom handling)
-        String payload = message.getPayload();
-        System.out.println("Received from client " + session.getId() + ": " + payload);
-        session.sendMessage(new TextMessage("Echo: " + payload));
+        ChatMessageDTO msg = objectMapper.readValue(message.getPayload(), ChatMessageDTO.class);
+
+        switch (msg.getType()) {
+            case "SUBSCRIBE":
+                chatRoomService.subscribe(msg.getRoomId(), session);
+                session.sendMessage(new TextMessage("Joined room: " + msg.getRoomId()));
+                break;
+
+            case "UNSUBSCRIBE":
+                chatRoomService.unsubscribe(msg.getRoomId(), session);
+                session.sendMessage(new TextMessage("Left room: " + msg.getRoomId()));
+                break;
+
+            case "MESSAGE":
+                String payload = objectMapper.writeValueAsString(msg);
+                for (WebSocketSession s : chatRoomService.getRoomMembers(msg.getRoomId())) {
+                    if (s.isOpen()) {
+                        s.sendMessage(new TextMessage(payload));
+                    }
+                }
+                break;
+            case "TYPING":
+                // for (WebSocketSession s : chatRoomService.getRoomMembers(msg.getRoomId())) {
+                // if (s.isOpen()) {
+                session.sendMessage(new TextMessage("Typing..."));
+                // }
+                // }
+                break;
+
+            case "STOP_TYPING":
+                // for (WebSocketSession s : chatRoomService.getRoomMembers(msg.getRoomId())) {
+                // if (s.isOpen()) {
+                session.sendMessage(new TextMessage("Typing stopped..."));
+                // }
+                // }
+                break;
+
+            default:
+                session.sendMessage(new TextMessage("Echo: " + msg.getContent()));
+        }
     }
 
     @Override

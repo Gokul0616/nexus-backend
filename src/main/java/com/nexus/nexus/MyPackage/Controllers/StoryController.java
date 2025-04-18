@@ -38,9 +38,10 @@ public class StoryController {
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<Story> uploadStory(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("userId") String userId) {
+            @RequestParam("userId") String userId,
+            @RequestParam("placement") String placement) {
         try {
-            Story savedStory = storyService.saveStory(file, userId);
+            Story savedStory = storyService.saveStory(file, userId, placement);
             MyWebSocketHandler.sendNewStory(savedStory);
 
             return ResponseEntity.ok(savedStory);
